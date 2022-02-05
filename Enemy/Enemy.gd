@@ -19,7 +19,7 @@ func _ready():
 func _physics_process(_delta):
 	position += direction
 	position.y = initial_position.y + sin(position.x/20)*wobble
-	if position.x > 1200:
+	if position.x >= 1200:
 		queue_free()
 		
 func damage(d):
@@ -32,6 +32,11 @@ func damage(d):
 			explosion.global_position = global_position
 		queue_free()
 
+func _on_Area2D_body_exited(body):
+	if body.name == "Player":
+		body.damage(100)
+		damage(100) # Replace with function body.
+
 func _on_Timer_timeout():
 	var Player = get_node_or_null("/root/Game/Player_Container/Player")
 	Effects = get_node_or_null("/root/Game/Effects")
@@ -39,11 +44,8 @@ func _on_Timer_timeout():
 		var bullet = Bullet.instance() 
 		var d = global_position.angle_to_point(Player.global_position) - PI/2
 		bullet.rotation = d
-		bullet.position = global_position + Vector2(0, -40).rotated(d)
+		bullet.global_position = global_position + Vector2(0, -40).rotated(d)
 		Effects.add_child(bullet)
 
 
-func _on_Area2D_body_entered(body):
-	if body.name == "Player":
-		body.damage(100)
-		damage(100)
+
